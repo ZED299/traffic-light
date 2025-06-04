@@ -11,13 +11,13 @@
 *******************************************************************************/
 
 void setup() {
-  Serial.begin(Baud_rate);
-  Serial.setTimeout(Time_out);
+  Serial.begin(9600);
+  Serial.setTimeout(5);
   pinmode();
 
   DS1307.begin();
   DS1307.stop();
-  /*uint16_t setTimeBuff[7] = {00, 57, 22, 5, 27, 2, 2025};// giây, phút , giờ, thứ, ngày , tháng , năm
+  /*uint16_t setTimeBuff[7] = {40, 59, 20, 7, 12, 1, 2025};// giây, phút , giờ, thứ, ngày , tháng , năm
   DS1307.setTime(setTimeBuff);
   DS1307.saveTimeToEEPROM();
   DS1307.setTimeFromEEPROM();
@@ -32,6 +32,7 @@ void loop() {
   runled();
   display();
   get_time();
+  //check_btn();
 }
 
 /*******************************************************************************
