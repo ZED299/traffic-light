@@ -8,79 +8,70 @@
 ** Definition
 *******************************************************************************/
 
-ShiftRegister74HC595<8> sr1(47, 49, 51);
-ShiftRegister74HC595<8> sr2(A13, A14, A15);
+#define    btn1    6
+#define    btn2    7
+#define    btn3    8
+#define    btn4    9
+#define    btn5    10
+#define    btn6    11
+#define    btn7    12
+#define    btn8    13
+#define    cbq     A0
+#define    btc1    A6
+#define    btc2    A7
+#define    btc3    A8
+#define    btc4    A9
 
-#define    btn1             6
-#define    btn2             7
-#define    btn3             8
-#define    btn4             9
-#define    btn5             10
-#define    btn6             11
-#define    btn7             12
-#define    btn8             13
-#define    cbq              A0
-#define    btc1             A6
-#define    btc2             A7
-#define    btc3             A8
-#define    btc4             A9
+#define    spk     53
 
-#define    spk              53
+#define    r1      23
+#define    y1      25
+#define    g1      27
+#define    r2      29
+#define    y2      31
+#define    g2      33
+#define    r3      35
+#define    y3      37
+#define    g3      39
+#define    r4      41
+#define    y4      43
+#define    g4      45
 
-#define    r1               23
-#define    y1               25
-#define    g1               27
-#define    r2               29
-#define    y2               31
-#define    g2               33
-#define    r3               35
-#define    y3               37
-#define    g3               39
-#define    r4               41
-#define    y4               43
-#define    g4               45
+#define    t1d     14
+#define    t1x     15
+#define    t2d     16
+#define    t2x     17
+#define    t3d     18
+#define    t3x     19
+#define    t4d     A1
+#define    t4x     A2
 
-#define    t1d              14
-#define    t1x              15
-#define    t2d              16
-#define    t2x              17
-#define    t3d              18
-#define    t3x              19
-#define    t4d              A1
-#define    t4x              A2
-
-#define    dd1              A3
-#define    dd2              A4
-
-#define    Baud_rate        9600
-#define    Time_out         5
-#define    Time_delay       1000
-#define    Blink_delay      500
-#define    Blink_Time       99
-#define    Char_Type        128
-#define    Pip_delay        100
+#define    dd1     A3
+#define    dd2     A4
 
 /*******************************************************************************
 ** Global Variable
 *******************************************************************************/
 
-uint8_t value, digit1, digit2, digit3, digit4, digit5, digit6, digit7, digit8, \
-    digit9, digit10, digit11, digit12, digit13, digit14, digit15, digit16;
-uint8_t d, run, ndb, t;
-uint8_t t1 = 0, t2 = 0, t3 = 0, t4 = 0;
-uint8_t PWD_1, PWD_2, PWD_3, PWD_4;
-uint8_t Time_PWD = 10;
-uint16_t time_led, time_display_led;
-uint16_t Time_PWD_1, Time_PWD_2, Time_PWD_3, Time_PWD_4;
+ShiftRegister74HC595<8> sr1(47, 49, 51);
+ShiftRegister74HC595<8> sr2(A13, A14, A15);
 
+int value, digit1, digit2, digit3, digit4, digit5, digit6, digit7, digit8, \
+    digit9, digit10, digit11, digit12, digit13, digit14, digit15, digit16;
+int d, run, ndb, t;
+long time_led, time_display_led;
+int t1 = 0, t2 = 0, t3 = 0, t4 = 0;
+int ndb1, ndb2, ndb3, ndb4;
+long time_ndb1, time_ndb2, time_ndb3, time_ndb4;
+int time_ndb = 10;
 /*
   t1: thời gian đèn làn 1
   t2: thời gian đèn làn 2
   t3: thời gian đèn rẽ trái 1
   t4: thời gian đèn rẽ trái 2
 */
-uint8_t mode = 0;
-uint8_t numberB[] = {
+int mode = 0;
+uint8_t  numberB[] = {
   B11000000, //0
   B11111001, //1
   B10100100, //2
@@ -106,7 +97,7 @@ void pinmode() {
   pinMode(btn6, INPUT_PULLUP);
   pinMode(btn7, INPUT_PULLUP);
   pinMode(btn8, INPUT_PULLUP);
-  pinMode(cbq,  INPUT_PULLUP);
+  pinMode(cbq, INPUT_PULLUP);
   pinMode(btc1, INPUT_PULLUP);
   pinMode(btc2, INPUT_PULLUP);
   pinMode(btc3, INPUT_PULLUP);
@@ -165,7 +156,7 @@ void pinmode() {
 
 void pip() {
   digitalWrite(spk, 0);
-  delay(Pip_delay);
+  delay(100);
   digitalWrite(spk, 1);
 }
 void check_btn() {
