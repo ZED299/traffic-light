@@ -10,16 +10,16 @@
 
 DFRobot_DS1307 DS1307;
 uint16_t getTimeBuff[7] = {0};
-long     gettime        = 0;
+long gettime = 0;
 
 /*******************************************************************************
 ** Function
 *******************************************************************************/
 
 void get_time() {
-  if (millis() - gettime > Time_delay) {
+  if (millis() - gettime > 500) {
     DS1307.getTime(getTimeBuff);
-    char outputarr[Char_Type];
+    char outputarr[128];
     sprintf(outputarr, "time: %d/%d/%d-%d %d:%d:%d\r\n",
             getTimeBuff[6],
             getTimeBuff[5],
@@ -29,8 +29,9 @@ void get_time() {
             getTimeBuff[1],
             getTimeBuff[0]
            );
+    //Serial.print(outputarr);
 
-    if ((getTimeBuff[2] < 23) && (getTimeBuff[2] >= 4)) {
+    if (getTimeBuff[2] <  23 && getTimeBuff[2] >= 4) {
       if (digitalRead(cbq) == 0) {
         digitalWrite(dd1, 1);
         digitalWrite(dd2, 1);
@@ -40,16 +41,16 @@ void get_time() {
         digitalWrite(dd2, 0);
       }
     }
-    if ((getTimeBuff[2] >= 23) || (getTimeBuff[2] < 4)) {
-      if((getTimeBuff[2] == 1) || \
-         (getTimeBuff[2] == 3) || \
-         (getTimeBuff[2] == 23)){
+    if (getTimeBuff[2] >= 23 || getTimeBuff[2] < 4) {
+      if((getTimeBuff[2] % 2) == 0)
+      {
         digitalWrite(dd1, 1);
         digitalWrite(dd2, 0);
       } else{
         digitalWrite(dd1, 0);
         digitalWrite(dd2, 1);
       }
+      
     }
 
     gettime = millis();
