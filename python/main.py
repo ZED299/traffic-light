@@ -1,50 +1,60 @@
 from ultralytics import YOLO
 import cv2
 import serial
+import time
 
-ser         = serial.Serial('COM5',9600)
+# Mở cổng serial tới Arduino
+ser = serial.Serial('COM5', 9600)
 ser.timeout = 1
+time.sleep(2)  # Đợi Arduino sẵn sàng
 
-# load yolov8 model
-model       = YOLO('yolov8n.pt')
-names       = model.names
-# load video
-video_path  = './test.mp4'
-cap         = cv2.VideoCapture(video_path)
+# Load model YOLO
+model = YOLO('yolov8n.pt')
+names = model.names
 
-ret         = True
-play        = True
+# Load video
+video_path = './test.mp4'
+cap = cv2.VideoCapture(video_path)
 
-# read frames
-while ret:
-    nb                         = 0
-    if play:
-        ret, frame             = cap.read()
-    results                    = model.predict(frame)
-    frame_                     = results[0].plot()
+# Biến lưu trạng thái gửi lần trước
+previous_mode = ""
+
+# Xử lý khung hình liên tục
+while True:
+    ret, frame = cap.read()
+    if not ret:
+        break
+
+    nb = 0
+    results = model.predict(frame, verbose=False)
+    frame_ = results[0].plot()
+
     for r in results:
         for c in r.boxes.cls:
-            if ((names[int(c)] == 'car') | \
-                (names[int(c)] == 'truck') | \
-                (names[int(c)] == 'motobike') | \
-                (names[int(c)] == 'bicycle') | \
-                (names[int(c)] == 'bus')):
-                nb             +=1
-    print(nb)
-    # visualize
-    cv2.putText
-    cv2.putText(frame_, 'NB: '+ str(nb), (50,50), cv2.FONT_HERSHEY_SIMPLEX,  1, (255, 0, 0) , 2, cv2.LINE_AA)
-    cv2.imshow('frame', frame_)
-    if nb <= 3 :
-        send = 'mode1'
-        ser.write(send.encode())
-    if nb > 3 :
-        send = 'mode2'
-        ser.write(send.encode())
-    key=cv2.waitKey(1)
-    if key == ord('c'):
-        play = True
-    if key == ord('p'):
-        play = False
-    if key == ord('q'):
+            if names[int(c)] in ['car', 'truck', 'motorbike', 'bicycle', 'bus']:
+                nb += 1
+
+    if nb >= 3:
+        current_mode = 'mode2'
+        ser.write(current_mode.encode())
+    # Xác định mode hiện tại
+    else:
+        current_mode = 'mode1'
+        ser.write(current_mode.encode())
+
+    # Chỉ gửi nếu có thay đổi
+    if current_mode != previous_mode:
+        print(f"Sent: {current_mode}")
+        previous_mode = current_mode
+
+    # Hiển thị kết quả
+    cv2.putText(frame_, f'Vehicles: {nb}', (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
+    cv2.imshow('Traffic Detection', frame_)
+
+    if cv2.waitKey(1) & 0xFF == ord('q'):
         break
+
+# Dọn tài nguyên
+cap.release()
+cv2.destroyAllWindows()
+ser.close()
